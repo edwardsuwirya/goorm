@@ -14,6 +14,9 @@ type CustomerRepository interface {
 	FindBy(by string, vals ...interface{}) ([]Customer, error)
 	Update(customer *Customer, by map[string]interface{}) error
 	Delete(id uint) error
+	BaseRepositoryAggregation
+	BaseRepositoryPaging
+	BaseRepositoryRaw
 }
 
 type customerRepository struct {
@@ -101,6 +104,53 @@ func (c *customerRepository) Delete(id uint) error {
 	result := c.db.Delete(&Customer{}, id)
 	if err := result.Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (c *customerRepository) Count(groupBy string) (int64, error) {
+	var total int64
+	result := c.db.Model(&Customer{}).Select("count(*)").Group(groupBy).First(&total)
+	if err := result.Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
+func (c *customerRepository) GroupBy(result interface{}, selectBy string, whereBy map[string]interface{}, groupBy string) error {
+	res := c.db.Model(&Customer{}).Select(selectBy).Where(whereBy).Group(groupBy).Find(result)
+	if err := res.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *customerRepository) Paging(itemPerPage int, page int) (interface{}, error) {
+	var customers []Customer
+	offset := (page - 1) * itemPerPage
+	res := c.db.Order("customer_id").Limit(itemPerPage).Offset(offset).Find(&customers)
+	if err := res.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+	return customers, nil
+}
+
+func (c *customerRepository) Query(result interface{}, sql string, vals ...interface{}) error {
+	res := c.db.Raw(sql, vals...).Scan(result)
+	if err := res.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		} else {
+			return err
+		}
 	}
 	return nil
 }

@@ -82,11 +82,42 @@ func main() {
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
-	err = repo.Delete(1)
-	customer, err := repo.FindFirstBy(map[string]interface{}{"mobile_phone_no": "0878812312123"})
+	//err = repo.Delete(1)
+	//customer, err := repo.FindFirstBy(map[string]interface{}{"mobile_phone_no": "0878812312123"})
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customer)
+
+	//count, err := repo.Count("customer_id")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(count)
+
+	//var Result []struct {
+	//	ActiveMember bool
+	//	Total        int64
+	//}
+	//err = repo.GroupBy(&Result, "active_member,count(active_member) as total", nil, "active_member")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(Result)
+
+	//customerPaging, err := repo.Paging(2,2)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customerPaging)
+
+	var Result []struct {
+		Name          string
+		MobilePhoneNo string
+	}
+	err = repo.Query(&Result, "select name,mobile_phone_no from wmb.m_customer where active_member = ?", true)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(customer)
-
+	fmt.Println(Result)
 }
