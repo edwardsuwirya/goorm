@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 /*
@@ -18,7 +19,10 @@ func main() {
 	dbPassword := "batchTwo"
 	dbName := "smm2"
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", dbHost, dbUser, dbPassword, dbName, dbPort)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "wmb.",
+		}})
 	if err != nil {
 		panic(err)
 	}
@@ -33,5 +37,56 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	//err = db.AutoMigrate(&Customer{})
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	repo := NewCustomerRepository(db)
+
+	// Insert customer
+	//customer01 := Customer{
+	//	MobilePhoneNo: "08788123123",
+	//	Name:          "Jution",
+	//}
+	//err = repo.Create(&customer01)
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	//customer01, err := repo.FindById(11)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customer01)
+	//
+	//customers, err := repo.Retrieve()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customers)
+
+	//customers, err := repo.FindAllBy(map[string]interface{}{"mobile_phone_no": "08788123123"})
+	//customers, err := repo.FindFirstBy(map[string]interface{}{"mobile_phone_no": "08788123123"})
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(customers)
+
+	//customers, err := repo.FindBy("name LIKE ? AND active_member = ?", "%Jut%", false)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+
+	//err = repo.Update(&customer, map[string]interface{}{"active_member": true, "name": "Jution Chandra Kirana"})
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	err = repo.Delete(1)
+	customer, err := repo.FindFirstBy(map[string]interface{}{"mobile_phone_no": "0878812312123"})
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(customer)
 
 }
