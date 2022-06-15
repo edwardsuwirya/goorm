@@ -1,18 +1,19 @@
-package main
+package repository
 
 import (
+	"enigmacamp.com/goorm/model"
 	"errors"
 	"gorm.io/gorm"
 )
 
 type CustomerRepository interface {
-	Create(customer *Customer) error
-	FindById(id uint) (Customer, error)
-	Retrieve() ([]Customer, error)
-	FindFirstBy(by map[string]interface{}) (Customer, error)
-	FindAllBy(by map[string]interface{}) ([]Customer, error)
-	FindBy(by string, vals ...interface{}) ([]Customer, error)
-	Update(customer *Customer, by map[string]interface{}) error
+	Create(customer *model.Customer) error
+	FindById(id uint) (model.Customer, error)
+	Retrieve() ([]model.Customer, error)
+	FindFirstBy(by map[string]interface{}) (model.Customer, error)
+	FindAllBy(by map[string]interface{}) ([]model.Customer, error)
+	FindBy(by string, vals ...interface{}) ([]model.Customer, error)
+	Update(customer *model.Customer, by map[string]interface{}) error
 	Delete(id uint) error
 	BaseRepositoryAggregation
 	BaseRepositoryPaging
@@ -23,13 +24,13 @@ type customerRepository struct {
 	db *gorm.DB
 }
 
-func (c *customerRepository) Create(customer *Customer) error {
+func (c *customerRepository) Create(customer *model.Customer) error {
 	result := c.db.Create(customer)
 	return result.Error
 }
 
-func (c *customerRepository) FindBy(by string, vals ...interface{}) ([]Customer, error) {
-	var customers []Customer
+func (c *customerRepository) FindBy(by string, vals ...interface{}) ([]model.Customer, error) {
+	var customers []model.Customer
 	result := c.db.Where(by, vals...).Find(&customers)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -42,8 +43,8 @@ func (c *customerRepository) FindBy(by string, vals ...interface{}) ([]Customer,
 }
 
 // When querying with struct, GORM will only query with non-zero fields
-func (c *customerRepository) FindFirstBy(by map[string]interface{}) (Customer, error) {
-	var customer Customer
+func (c *customerRepository) FindFirstBy(by map[string]interface{}) (model.Customer, error) {
+	var customer model.Customer
 	result := c.db.Where(by).First(&customer)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -54,8 +55,8 @@ func (c *customerRepository) FindFirstBy(by map[string]interface{}) (Customer, e
 	}
 	return customer, nil
 }
-func (c *customerRepository) FindAllBy(by map[string]interface{}) ([]Customer, error) {
-	var customers []Customer
+func (c *customerRepository) FindAllBy(by map[string]interface{}) ([]model.Customer, error) {
+	var customers []model.Customer
 	result := c.db.Where(by).Find(&customers)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -66,8 +67,8 @@ func (c *customerRepository) FindAllBy(by map[string]interface{}) ([]Customer, e
 	}
 	return customers, nil
 }
-func (c *customerRepository) FindById(id uint) (Customer, error) {
-	var customer Customer
+func (c *customerRepository) FindById(id uint) (model.Customer, error) {
+	var customer model.Customer
 	result := c.db.First(&customer, id)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -79,8 +80,8 @@ func (c *customerRepository) FindById(id uint) (Customer, error) {
 	return customer, nil
 }
 
-func (c *customerRepository) Retrieve() ([]Customer, error) {
-	var customers []Customer
+func (c *customerRepository) Retrieve() ([]model.Customer, error) {
+	var customers []model.Customer
 	result := c.db.First(&customers)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -92,7 +93,7 @@ func (c *customerRepository) Retrieve() ([]Customer, error) {
 	return customers, nil
 }
 
-func (c *customerRepository) Update(customer *Customer, by map[string]interface{}) error {
+func (c *customerRepository) Update(customer *model.Customer, by map[string]interface{}) error {
 	result := c.db.Model(customer).Updates(by)
 	if err := result.Error; err != nil {
 		return err
@@ -101,7 +102,7 @@ func (c *customerRepository) Update(customer *Customer, by map[string]interface{
 }
 
 func (c *customerRepository) Delete(id uint) error {
-	result := c.db.Delete(&Customer{}, id)
+	result := c.db.Delete(&model.Customer{}, id)
 	if err := result.Error; err != nil {
 		return err
 	}
@@ -110,7 +111,7 @@ func (c *customerRepository) Delete(id uint) error {
 
 func (c *customerRepository) Count(groupBy string) (int64, error) {
 	var total int64
-	result := c.db.Model(&Customer{}).Select("count(*)").Group(groupBy).First(&total)
+	result := c.db.Model(&model.Customer{}).Select("count(*)").Group(groupBy).First(&total)
 	if err := result.Error; err != nil {
 		return 0, err
 	}
@@ -118,7 +119,7 @@ func (c *customerRepository) Count(groupBy string) (int64, error) {
 }
 
 func (c *customerRepository) GroupBy(result interface{}, selectBy string, whereBy map[string]interface{}, groupBy string) error {
-	res := c.db.Model(&Customer{}).Select(selectBy).Where(whereBy).Group(groupBy).Find(result)
+	res := c.db.Model(&model.Customer{}).Select(selectBy).Where(whereBy).Group(groupBy).Find(result)
 	if err := res.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
@@ -130,7 +131,7 @@ func (c *customerRepository) GroupBy(result interface{}, selectBy string, whereB
 }
 
 func (c *customerRepository) Paging(itemPerPage int, page int) (interface{}, error) {
-	var customers []Customer
+	var customers []model.Customer
 	offset := (page - 1) * itemPerPage
 	res := c.db.Order("customer_id").Limit(itemPerPage).Offset(offset).Find(&customers)
 	if err := res.Error; err != nil {

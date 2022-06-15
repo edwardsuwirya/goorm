@@ -1,4 +1,4 @@
-package main
+package repository
 
 type BaseRepositoryAggregation interface {
 	Count(groupBy string) (int64, error)
