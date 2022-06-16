@@ -37,12 +37,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{})
+	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{}, &Bill{}, &BillDetail{})
 	if err != nil {
 		panic(err)
 	}
 
-	repo := NewCustomerRepository(db)
+	//repo := NewCustomerRepository(db)
 
 	//01. Create Customer With Credential
 	//customer01 := Customer{
@@ -97,20 +97,39 @@ func main() {
 	//repo.Create(&customer01)
 
 	//02. Get Customer Info & Poin
-	customer01, _ := repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 31}, "CustomerPrivileges")
-	fmt.Println(customer01)
+	//customer01, _ := repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 31}, "CustomerPrivileges")
+	//fmt.Println(customer01)
 
 	//03. Get All Customer Info (User Cred & Priv)
 	//customer01, _ := repo.FindFirstAllPreload(map[string]interface{}{"customer_id": 31})
 	//fmt.Println(customer01)
 
 	//03. Update discount
-	c := customer01.(Customer)
-	disc := 10.0
-	c.CustomerPrivileges.DiscountPct = &disc
-	err = repo.UpdateBy(&c)
-	if err != nil {
-		fmt.Println(err)
-	}
+	//c := customer01.(Customer)
+	//disc := 10.0
+	//c.CustomerPrivileges.DiscountPct = &disc
+	//err = repo.UpdateBy(&c)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+
+	// Has Many
+	repo := NewBillRepository(db)
+	//01.Create Bill
+	//bill := Bill{
+	//	TableNo:   "1",
+	//	TransDate: time.Now(),
+	//	BillDetail: []BillDetail{
+	//		{
+	//			MenuName: "Nasi Goreng",
+	//			Qty:      1,
+	//		},
+	//	},
+	//}
+	//repo.Create(&bill)
+
+	//02. Find Bill
+	bill, _ := repo.FindFirstWithPreload(map[string]interface{}{"id": "4e5f726a-fda3-4845-bd2e-46f4e7c2fc68"}, "BillDetail")
+	fmt.Println(bill)
 
 }

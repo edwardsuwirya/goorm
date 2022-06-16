@@ -26,10 +26,6 @@ type customerRepository struct {
 	db *gorm.DB
 }
 
-func (c *customerRepository) preload(model string) {
-	c.db.Preload(model)
-}
-
 func (c *customerRepository) Create(customer *Customer) error {
 	result := c.db.Create(customer)
 	return result.Error
