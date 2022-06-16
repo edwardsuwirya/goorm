@@ -17,4 +17,5 @@ type BaseRepositoryRaw interface {
 
 type BaseRepositoryAdvQuery interface {
 	FindFirstWithPreload(by map[string]interface{}, preload string) (interface{}, error)
+	FindFirstAllPreload(by map[string]interface{}) (interface{}, error)
 }

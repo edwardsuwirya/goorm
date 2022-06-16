@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CustomerRepository interface {
@@ -64,6 +65,18 @@ func (c *customerRepository) FindFirstBy(by map[string]interface{}) (Customer, e
 func (c *customerRepository) FindFirstWithPreload(by map[string]interface{}, preload string) (interface{}, error) {
 	var customer Customer
 	result := c.db.Preload(preload).Where(by).First(&customer)
+	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return customer, nil
+		} else {
+			return customer, err
+		}
+	}
+	return customer, nil
+}
+func (c *customerRepository) FindFirstAllPreload(by map[string]interface{}) (interface{}, error) {
+	var customer Customer
+	result := c.db.Preload(clause.Associations).Where(by).First(&customer)
 	if err := result.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return customer, nil

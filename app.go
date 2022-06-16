@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.AutoMigrate(&Customer{}, &UserCredential{})
+	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{})
 	if err != nil {
 		panic(err)
 	}
@@ -70,14 +70,47 @@ func main() {
 	//fmt.Println(customer01)
 
 	//03. Update Password
-	customer01, _ := repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 3}, "UserCredential")
+	//customer01, _ := repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 3}, "UserCredential")
+	//c := customer01.(Customer)
+	//c.UserCredential.UserPassword = "AbCdEf"
+	//err = repo.UpdateBy(&c)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//customer01, _ = repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 3}, "UserCredential")
+	//fmt.Println(customer01)
+
+	// Has One
+	//01. Create Customer With Credential
+	//customer01 := Customer{
+	//	MobilePhoneNo: "0856000113",
+	//	Name:          "Mamang",
+	//	UserCredential: UserCredential{
+	//		UserName:     "M4M4n6",
+	//		UserPassword: "racing",
+	//	},
+	//	CustomerPrivileges: CustomerPrivileges{
+	//		DiscountPct: new(float64),
+	//	},
+	//}
+	//
+	//repo.Create(&customer01)
+
+	//02. Get Customer Info & Poin
+	customer01, _ := repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 31}, "CustomerPrivileges")
+	fmt.Println(customer01)
+
+	//03. Get All Customer Info (User Cred & Priv)
+	//customer01, _ := repo.FindFirstAllPreload(map[string]interface{}{"customer_id": 31})
+	//fmt.Println(customer01)
+
+	//03. Update discount
 	c := customer01.(Customer)
-	c.UserCredential.UserPassword = "AbCdEf"
+	disc := 10.0
+	c.CustomerPrivileges.DiscountPct = &disc
 	err = repo.UpdateBy(&c)
 	if err != nil {
 		fmt.Println(err)
 	}
-	customer01, _ = repo.FindFirstWithPreload(map[string]interface{}{"customer_id": 3}, "UserCredential")
-	fmt.Println(customer01)
 
 }
