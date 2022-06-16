@@ -13,14 +13,20 @@ type CustomerRepository interface {
 	FindAllBy(by map[string]interface{}) ([]Customer, error)
 	FindBy(by string, vals ...interface{}) ([]Customer, error)
 	Update(customer *Customer, by map[string]interface{}) error
+	UpdateBy(existingCustomer *Customer) error
 	Delete(id uint) error
 	BaseRepositoryAggregation
 	BaseRepositoryPaging
 	BaseRepositoryRaw
+	BaseRepositoryAdvQuery
 }
 
 type customerRepository struct {
 	db *gorm.DB
+}
+
+func (c *customerRepository) preload(model string) {
+	c.db.Preload(model)
 }
 
 func (c *customerRepository) Create(customer *Customer) error {
@@ -54,6 +60,20 @@ func (c *customerRepository) FindFirstBy(by map[string]interface{}) (Customer, e
 	}
 	return customer, nil
 }
+
+func (c *customerRepository) FindFirstWithPreload(by map[string]interface{}, preload string) (interface{}, error) {
+	var customer Customer
+	result := c.db.Preload(preload).Where(by).First(&customer)
+	if err := result.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return customer, nil
+		} else {
+			return customer, err
+		}
+	}
+	return customer, nil
+}
+
 func (c *customerRepository) FindAllBy(by map[string]interface{}) ([]Customer, error) {
 	var customers []Customer
 	result := c.db.Where(by).Find(&customers)
@@ -90,6 +110,14 @@ func (c *customerRepository) Retrieve() ([]Customer, error) {
 		}
 	}
 	return customers, nil
+}
+
+func (c *customerRepository) UpdateBy(existingCustomer *Customer) error {
+	result := c.db.Session(&gorm.Session{FullSaveAssociations: true}).Save(existingCustomer)
+	if err := result.Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *customerRepository) Update(customer *Customer, by map[string]interface{}) error {

@@ -14,3 +14,7 @@ type BaseRepositoryPaging interface {
 type BaseRepositoryRaw interface {
 	Query(result interface{}, sql string, vals ...interface{}) error
 }
+
+type BaseRepositoryAdvQuery interface {
+	FindFirstWithPreload(by map[string]interface{}, preload string) (interface{}, error)
+}
