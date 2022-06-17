@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{}, &Bill{}, &BillDetail{})
+	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{}, &Bill{}, &BillDetail{}, &FnB{}, &MenuCategory{})
 	if err != nil {
 		panic(err)
 	}
@@ -114,7 +114,7 @@ func main() {
 	//}
 
 	// Has Many
-	repo := NewBillRepository(db)
+	//repo := NewBillRepository(db)
 	//01.Create Bill
 	//bill := Bill{
 	//	TableNo:   "1",
@@ -129,7 +129,33 @@ func main() {
 	//repo.Create(&bill)
 
 	//02. Find Bill
-	bill, _ := repo.FindFirstWithPreload(map[string]interface{}{"id": "4e5f726a-fda3-4845-bd2e-46f4e7c2fc68"}, "BillDetail")
-	fmt.Println(bill)
+	//bill, _ := repo.FindFirstWithPreload(map[string]interface{}{"id": "4e5f726a-fda3-4845-bd2e-46f4e7c2fc68"}, "BillDetail")
+	//fmt.Println(bill)
 
+	//Many To Many
+	//01.Register New Menu
+	repo := NewFnBRepository(db)
+	//fnb01 := FnB{
+	//	MenuName: "Nasi Goreng",
+	//	Price:    0,
+	//	MenuCategories: []MenuCategory{
+	//		{
+	//			ID: 1,
+	//		},
+	//		{
+	//			ID: 16,
+	//		},
+	//		{
+	//			ID: 13,
+	//		},
+	//	},
+	//}
+	//repo.Create(&fnb01)
+	fnb01, err := repo.FindFirstWithPreload(map[string]interface{}{"id": 1}, "MenuCategories")
+	if err != nil {
+		return
+	}
+	fmt.Println(fnb01)
+
+	//02.Delete Category from a menu
 }
