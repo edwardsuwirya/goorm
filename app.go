@@ -37,10 +37,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{}, &Bill{}, &BillDetail{}, &FnB{}, &MenuCategory{})
-	if err != nil {
-		panic(err)
-	}
+	//err = db.AutoMigrate(&Customer{}, &UserCredential{}, &CustomerPrivileges{}, &Bill{}, &BillDetail{}, &FnB{}, &MenuCategory{})
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	//repo := NewCustomerRepository(db)
 
@@ -153,9 +153,23 @@ func main() {
 	//repo.Create(&fnb01)
 	fnb01, err := repo.FindFirstWithPreload(map[string]interface{}{"id": 1}, "MenuCategories")
 	if err != nil {
-		return
+		fmt.Println(err)
 	}
-	fmt.Println(fnb01)
+	//fmt.Println(fnb01)
 
 	//02.Delete Category from a menu
+	fnb := fnb01.(FnB)
+	err = repo.UpdateAssociation(&fnb, "MenuCategories", []MenuCategory{
+		{
+			ID: 31111,
+		},
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(fnb)
+
+	//03.Clear Category from a menu
+	//err = repo.ClearAssociation(&fnb, "MenuCategories")
+	//fmt.Println(fnb)
 }

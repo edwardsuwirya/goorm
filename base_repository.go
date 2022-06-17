@@ -19,6 +19,7 @@ type BaseRepositoryAdvQuery interface {
 	FindFirstWithPreload(by map[string]interface{}, preload string) (interface{}, error)
 	FindFirstAllPreload(by map[string]interface{}) (interface{}, error)
 }
-
-type BaseRepositoryAssociation interface {
+type BaseRepositoryAssociationUpdate interface {
+	UpdateAssociation(assocModel interface{}, assocName string, assocNewValue interface{}) error
+	ClearAssociation(assocModel interface{}, assocName string) error
 }
