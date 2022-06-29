@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -108,13 +109,23 @@ func (c *customerRepository) Delete(id uint) error {
 	return nil
 }
 
-func (c *customerRepository) Count(groupBy string) (int64, error) {
-	var total int64
-	result := c.db.Model(&Customer{}).Select("count(*)").Group(groupBy).First(&total)
-	if err := result.Error; err != nil {
-		return 0, err
+func (c *customerRepository) Count(result interface{}, groupBy string) error {
+	sqlStmt := c.db.Model(&Customer{}).Unscoped()
+	var res *gorm.DB
+	if groupBy == "" {
+		t, ok := result.(*int64)
+		if ok {
+			res = sqlStmt.Count(t)
+		} else {
+			return errors.New("Must be int64")
+		}
+	} else {
+		res = sqlStmt.Select(fmt.Sprintf("%s,%s", groupBy, "count(*) as total")).Group(groupBy).Find(result)
 	}
-	return total, nil
+	if err := res.Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *customerRepository) GroupBy(result interface{}, selectBy string, whereBy map[string]interface{}, groupBy string) error {

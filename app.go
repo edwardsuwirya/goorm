@@ -16,7 +16,7 @@ func main() {
 	dbHost := "167.172.69.254"
 	dbPort := "5432"
 	dbUser := "smm2"
-	dbPassword := "batchTwo"
+	dbPassword := "5mmB2"
 	dbName := "smm2"
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", dbHost, dbUser, dbPassword, dbName, dbPort)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -42,7 +42,7 @@ func main() {
 	//	panic(err)
 	//}
 
-	repo := NewCustomerRepository(db)
+	repo := NewCustomerRepository(db.Debug())
 
 	// Insert customer
 	//customer01 := Customer{
@@ -89,11 +89,23 @@ func main() {
 	//}
 	//fmt.Println(customer)
 
-	//count, err := repo.Count("customer_id")
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(count)
+	var total int64
+	err = repo.Count(&total, "")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(total)
+
+	var TotalActiveMember []struct {
+		Name         string
+		ActiveMember bool
+		Total        int64
+	}
+	err = repo.Count(&TotalActiveMember, "active_member")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(TotalActiveMember)
 
 	//var Result []struct {
 	//	ActiveMember bool
@@ -111,13 +123,13 @@ func main() {
 	//}
 	//fmt.Println(customerPaging)
 
-	var Result []struct {
-		Name          string
-		MobilePhoneNo string
-	}
-	err = repo.Query(&Result, "select name,mobile_phone_no from wmb.m_customer where active_member = ?", true)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(Result)
+	//var Result []struct {
+	//	Name          string
+	//	MobilePhoneNo string
+	//}
+	//err = repo.Query(&Result, "select name,mobile_phone_no from wmb.m_customer where active_member = ?", true)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(Result)
 }
